@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-if node['apache']['version'] == "2.4" 
+if node['apache']['version'] == '2.4'
   apache_module 'authz_core'
-else 
+else
   apache_module 'authz_default'
 end
