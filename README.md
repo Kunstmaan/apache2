@@ -1,5 +1,7 @@
-Description
-===========
+apache2 Cookbook
+================
+[![Build Status](https://secure.travis-ci.org/opscode-cookbooks/apache2.png?branch=master)](http://travis-ci.org/opscode-cookbooks/apache2)
+
 
 This cookbook provides a complete Debian/Ubuntu style Apache HTTPD
 configuration. Non-Debian based distributions such as Red Hat/CentOS,
@@ -161,7 +163,7 @@ the top of the file.
 * `node['apache']['cache_dir']` - Location for cached files used by Apache itself or recipes
 * `node['apache']['pid_file']` - Location of the PID file for Apache httpd
 * `node['apache']['lib_dir']` - Location for shared libraries
-* `node['apache']['default_site_enabled']` - Default site enabled. Defaults to true on redhat-family platforms
+* `node['apache']['default_site_enabled']` - Default site enabled. Default is false.
 * `node['apache']['ext_status']` - if true, enables ExtendedStatus for `mod_status`
 
 General settings
@@ -170,6 +172,8 @@ General settings
 These are general settings used in recipes and templates. Default
 values are noted.
 
+* `node['apache']['version']` - Specifing 2.4 triggers apache 2.4 support.  Default is 2.2.
+* `node['apache']['listen_addresses']` - Addresses that httpd should listen on. Default is any ("*").
 * `node['apache']['listen_ports']` - Ports that httpd should listen on. Default is port 80.
 * `node['apache']['contact']` - Value for ServerAdmin directive. Default "ops@example.com".
 * `node['apache']['timeout']` - Value for the Timeout directive. Default is 300.
@@ -177,6 +181,7 @@ values are noted.
 * `node['apache']['keepaliverequests']` - Value for MaxKeepAliveRequests. Default is 100.
 * `node['apache']['keepalivetimeout']` - Value for the KeepAliveTimeout directive. Default is 5.
 * `node['apache']['default_modules']` - Array of module names. Can take "mod_FOO" or "FOO" as names, where FOO is the apache module, e.g. "`mod_status`" or "`status`".
+* `node['apache']['mpm']` - With apache.version 2.4, specifies what Multi-Processing Module to enable. Default is "prefork".
 
 The modules listed in `default_modules` will be included as recipes in `recipe[apache::default]`.
 
@@ -239,7 +244,7 @@ below in more detail.
 
 The following recipes merely enable the specified module: `mod_alias`,
 `mod_basic`, `mod_digest`, `mod_authn_file`, `mod_authnz_ldap`,
-`mod_authz_default`, `mod_authz_groupfile`, `mod_authz_host`,
+`mod_authz_core`, `mod_authz_groupfile`, `mod_authz_host`,
 `mod_authz_user`, `mod_autoindex`, `mod_cgi`, `mod_dav_fs`,
 `mod_dav_svn`, `mod_deflate`, `mod_dir`, `mod_env`, `mod_expires`,
 `mod_headers`, `mod_ldap`, `mod_log_config`, `mod_mime`,
@@ -413,13 +418,14 @@ the definition is used. See __Examples__.
 ### Parameters:
 
 * `name` - Name of the module enabled or disabled with the `a2enmod` or `a2dismod` scripts.
+* `identifier` - String to identify the module for the `LoadModule` directive. Not typically needed, defaults to `#{name}_module`
 * `enable` - Default true, which uses `a2enmod` to enable the module. If false, the module will be disabled with `a2dismod`.
 * `conf` - Default false. Set to true if the module has a config file, which will use `apache_conf` for the file.
 * `filename` - specify the full name of the file, e.g.
 
 ### Examples:
 
-Enable the ssl module, which also has a configuration template in `templates/default/ssl.conf.erb`.
+Enable the ssl module, which also has a configuration template in `templates/default/mods/ssl.conf.erb`.
 
     apache_module "ssl" do
       conf true
@@ -565,10 +571,12 @@ License and Authors
 * Author:: Sean OMeara <someara@opscode.com>
 * Author:: Seth Chisamore <schisamo@opscode.com>
 * Author:: Gilles Devaux <gilles@peerpong.com>
+* Author:: Sander van Zoest <svanzoest@onehealth.com>
 
 * Copyright:: 2009-2012, Opscode, Inc
 * Copyright:: 2011, Atriso
 * Copyright:: 2011, CustomInk, LLC.
+* Copyright:: 2013, OneHealth Solutions, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
