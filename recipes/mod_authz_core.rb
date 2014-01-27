@@ -19,6 +19,4 @@
 
 if node['apache']['version'] == '2.4'
   apache_module 'authz_core'
-else
-  apache_module 'authz_default'
 end
